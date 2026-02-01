@@ -1,0 +1,21 @@
+ID number,height,status,error_msg
+1000001,0.00,carved,
+1000002,0.26,not carved,
+1000003,0.53,not carved,
+1000004,0.79,carving,
+1000005,1.05,carved,
+1000006,1.32,carved,
+1000007,1.58,carved,
+1000008,1.84,carved,
+1000009,2.11,carved,
+1000010,2.37,carved,
+1000011,2.63,carved,
+1000012,2.89,carved,
+1000013,3.16,carved,[Errno 2] could not open port : [Errno 2] No such file or directory: ''
+1000014,3.42,carved,[Errno 2] could not open port : [Errno 2] No such file or directory: ''
+1000015,3.68,error,[Errno 2] could not open port : [Errno 2] No such file or directory: ''
+1000016,3.95,error,[Errno 2] could not open port : [Errno 2] No such file or directory: ''
+1000017,4.21,carved,
+1000018,4.47,carved,
+1000019,4.74,carved,
+1000020,5.00,carving,
