@@ -26,10 +26,13 @@ def basic_default() -> AppConfig:
         char_stroke_width=0.8,
         font_name="monospace",
         # Workpiece and layout
-        board_width_mm=900.0,
-        board_height_mm=30.0,
+        board_width_mm=30.0,
+        board_height_mm=90.0,
         text_left_margin_mm=20.0,
         text_total_width_mm=50.0,
+        text_top_margin_mm=20.0,
+        text_total_length_mm=50.0,
+        text_flip_180=True,
         text_gap_mm=1.0,
         # Hole parameters
         hole_radius_mm=2.0,

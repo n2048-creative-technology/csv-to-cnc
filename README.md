@@ -6,9 +6,10 @@ Overview
 - Uses installed system fonts to outline digits so carved text matches the chosen font.
 
 Key Geometry (defaults)
-- Workpiece size: 900 x 30 mm (90 x 3 cm).
-- ID text: left margin 20 mm, vertically centered, total width ~50 mm, depth 5 mm.
-- Positioning circle: depth 10 mm, vertically centered. X offset from left margin equals `height_cm * 10 mm`.
+- Coordinate system: origin at top-left (0,0); bottom-right is (30 mm, 90 mm).
+- Workpiece size: 30 x 90 mm (3 x 9 cm) aligned along Y.
+- ID text: vertical top-to-bottom, horizontally centered, top margin 20 mm, total length ~50 mm, depth 5 mm.
+- Positioning circle: depth 10 mm, horizontally centered. Y offset from the top equals `top_margin + height_cm * 10 mm`.
 
 Requirements
 - Python 3.9+

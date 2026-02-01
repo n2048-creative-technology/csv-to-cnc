@@ -175,7 +175,7 @@ def build_job_gcode(id_value: str, height: float, cfg: MachineConfig) -> List[st
     if cfg.spindle_rpm:
         lines.append(f"M3 S{cfg.spindle_rpm}")
 
-    # Engrave ID (digits only) scaled to target width and centered vertically
+    # Engrave ID (digits only) vertically top->bottom, scaled to target length, centered horizontally
     digits = "".join(ch for ch in str(id_value) if ch.isdigit())
     if digits:
         try:
@@ -183,13 +183,15 @@ def build_job_gcode(id_value: str, height: float, cfg: MachineConfig) -> List[st
             from matplotlib.font_manager import FontProperties
             import numpy as np
         except Exception:
-            # Fallback to builtin strokes roughly scaled by width per digit
-            x = cfg.origin_x + cfg.text_left_margin_mm
-            y_center = cfg.origin_y + cfg.board_height_mm / 2.0
-            y = y_center - cfg.char_height / 2.0
+            # Fallback to builtin strokes: stack digits vertically from top
+            y_top = cfg.origin_y + cfg.text_top_margin_mm
+            per_len = cfg.text_total_length_mm / max(1, len(digits))
+            x_center = cfg.origin_x + cfg.board_width_mm / 2.0
+            x = x_center - per_len / 2.0
+            y = y_top
             for ch in digits:
-                lines.extend(_engrave_digit_gcode_builtin(ch, x, y, cfg.char_height, cfg))
-                x += cfg.char_height + cfg.text_gap_mm
+                lines.extend(_engrave_digit_gcode_builtin(ch, x, y, per_len, cfg))
+                y += (per_len + cfg.text_gap_mm)
         else:
             fam, style = _resolve_font_family(cfg.font_name)
             tp = TextPath((0, 0), digits, size=100, prop=FontProperties(family=fam, style=style))
@@ -198,20 +200,28 @@ def build_job_gcode(id_value: str, height: float, cfg: MachineConfig) -> List[st
                 all_pts = np.vstack(polys)
                 min_x, min_y = float(np.min(all_pts[:, 0])), float(np.min(all_pts[:, 1]))
                 max_x, max_y = float(np.max(all_pts[:, 0])), float(np.max(all_pts[:, 1]))
-                width = max(1e-6, max_x - min_x)
-                height_box = max(1e-6, max_y - min_y)
-                scale = cfg.text_total_width_mm / width
-                # Offsets to place left at margin and vertically centered
-                x0 = cfg.origin_x + cfg.text_left_margin_mm - min_x * scale
-                y_center = cfg.origin_y + cfg.board_height_mm / 2.0
-                y0 = y_center - 0.5 * (height_box * scale) - min_y * scale
-                # Shift polys to baseline 0,0
+                # Shift to baseline
                 shifted = [((poly - (min_x, min_y))) for poly in polys]
-                lines.extend(_trace_polygons(shifted, x0, y0, scale, cfg))
+                # Rotate -90 degrees: (x, y) -> (y, -x)
+                rotated = [np.column_stack((s[:, 1], -s[:, 0])) for s in shifted]
+                # Optional 180-degree flip
+                if getattr(cfg, "text_flip_180", False):
+                    rotated = [(-s) for s in rotated]
+                all_r = np.vstack(rotated)
+                r_min_x, r_min_y = float(np.min(all_r[:, 0])), float(np.min(all_r[:, 1]))
+                r_max_x, r_max_y = float(np.max(all_r[:, 0])), float(np.max(all_r[:, 1]))
+                length_y = max(1e-6, r_max_y - r_min_y)
+                scale = cfg.text_total_length_mm / length_y
+                # Place: horizontally centered, top aligned at top margin (top-left origin, +Y down)
+                x_center = cfg.origin_x + cfg.board_width_mm / 2.0
+                x0 = x_center - 0.5 * (r_min_x + r_max_x) * scale
+                y_top = cfg.origin_y + cfg.text_top_margin_mm
+                y0 = y_top - (r_min_y * scale)
+                lines.extend(_trace_polygons(rotated, x0, y0, scale, cfg))
 
-    # Positioning hole: circular interpolation at center height, X offset by height value
-    hole_center_y = cfg.origin_y + cfg.board_height_mm / 2.0
-    hole_center_x = cfg.origin_x + cfg.text_left_margin_mm + (height * cfg.hole_offset_per_cm_mm)
+    # Positioning hole: centered horizontally, Y offset from top by height value
+    hole_center_x = cfg.origin_x + cfg.board_width_mm / 2.0
+    hole_center_y = cfg.origin_y + (cfg.text_top_margin_mm + (height * cfg.hole_offset_per_cm_mm))
     r = max(0.5, cfg.hole_radius_mm)
     target_z = -abs(cfg.hole_depth_mm)
     z = 0.0

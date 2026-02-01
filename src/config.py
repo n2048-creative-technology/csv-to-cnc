@@ -21,7 +21,11 @@ class MachineConfig:
     board_width_mm: float = 900.0
     board_height_mm: float = 30.0
     text_left_margin_mm: float = 20.0
-    text_total_width_mm: float = 50.0
+    text_total_width_mm: float = 50.0  # legacy horizontal layout
+    # Vertical layout
+    text_top_margin_mm: float = 20.0
+    text_total_length_mm: float = 50.0
+    text_flip_180: bool = False
     text_gap_mm: float = 1.0
     # Hole parameters
     hole_radius_mm: float = 2.0
