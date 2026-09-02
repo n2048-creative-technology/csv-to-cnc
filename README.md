@@ -1,5 +1,7 @@
 CSV-Driven CNC Carving App
 
+Status: Finished. Working Tkinter desktop app with a passing test suite (9/9) and a functional simulation mode; usable as-is. Note: earlier commits in this repo's history include committed build artifacts (`build/`, `dist/`, `__pycache__/`) and generated output (`gcode_out/*.nc`) — a `.gitignore` has been added going forward to keep new commits clean, but existing history was left untouched.
+
 Overview
 - Desktop app that reads a CSV and drives a CNC to engrave a numeric ID and cut a positioning circle on wooden boards.
 - Supports real GRBL serial and a full-featured simulation mode with realistic responses and delays.
@@ -75,3 +77,7 @@ Safety Notes
 Tests
 - Run: `python -m pytest -q`
 - Includes basic tests for filename sanitization, height mapping, CSV updates, and G-code generation.
+- Verified: 9/9 tests passing.
+
+License
+- MIT License — see [LICENSE](LICENSE).
